@@ -13,7 +13,7 @@ import { ImSpinner8 } from 'react-icons/im';
 import { weathers } from './weather';
 
 // Api Key
-const ApiKey = 'd70ff297545dff83bcf2e1df2107e744';
+import { apiKey } from './config';
 
 const App = () => {
 
@@ -23,9 +23,11 @@ const App = () => {
   const [input, setInput] = useState('');
   const [animate, setAnimate] = useState(false);
   const [errorMsg, setErrorMsg] = useState('');
+  const [prevLocation, setPrevLocation] = useState('');
 
   const submitHandler = (e) => {
     e.preventDefault();
+    setData(null);
     setLocation(input);
     setInput("");
   };
@@ -33,12 +35,14 @@ const App = () => {
   // Data fetching from openweathermap
   useEffect(() => {
 
-    const url = `https://api.openweathermap.org/data/2.5/weather?q=${location}&units=metric&appid=${ApiKey}`;
+    const url = `https://api.openweathermap.org/data/2.5/weather?q=${location}&units=metric&appid=${apiKey}`;
 
     axios.get(url).then((resp) => {
         setData(resp.data);
+        setPrevLocation(location);
     }).catch((err) => {
       setErrorMsg(err);
+      setLocation(prevLocation);
     });
 
   }, [location]);
@@ -56,7 +60,7 @@ const App = () => {
 
   // Icon will be set according to weather
   let icon;
-  if(data !== null) icon = weathers[data.weather[0].main];
+  if(data !== null) icon = weathers[data.weather[0].main]; 
   
 
   // Date
@@ -64,7 +68,7 @@ const App = () => {
 
   return (
   <div className='w-full h-screen bg-gradientBg bg-no-repeat bg-cover bg-center flex flex-col items-center justify-center px-4 lg-px-0'>
-    {errorMsg && <div className='w-full max-w-[90vw] lg:max-w-[450px] bg-[#ff208c] text-white absolute top-10 lg:top-10 p-4 capitalize rounded-md'>{`${errorMsg.response.data.message }`}</div>}
+    {errorMsg && <div className='w-full max-w-[90vw] lg:max-w-[450px] bg-[#ff208c] text-white absolute top-2 lg:top-10 p-4 capitalize rounded-md'>{`${errorMsg.response.data.message }`}</div>}
     <form onSubmit={submitHandler} className={`${animate ? 'animate-shake' : 'animate-none'} h-16 bg-black/30 w-full max-w-[450px] rounded-full backdrop-blur-[32px] mb-8`}>
       <div className='h-full flex items-center justify-between p-2'>
         <input type="text" placeholder='Search by city' value={input} onChange={(e) => setInput(e.target.value)} className='flex-1 bg-transparent outline-none placeholder:text-white text-white font-light pl-6 h-full'/>
