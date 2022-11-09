@@ -1,0 +1,1 @@
+# Weather App made with React and Tailwindcss using OpenWeatherMap API
